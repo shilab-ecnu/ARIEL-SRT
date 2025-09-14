@@ -40,6 +40,7 @@ class SVGPRegressionModel(ApproximateGP):
         covar_x = self.covar_module(x)
         latent_pred = MultivariateNormal(mean_x, covar_x)
         return latent_pred
+    
 
 def Appro_GP(x1, x2, y2, n_intro = 500, num_epochs = 1000, lr = 0.01):
     kmeans = KMeans(n_clusters=n_intro, random_state=42)
@@ -77,6 +78,7 @@ def Appro_GP(x1, x2, y2, n_intro = 500, num_epochs = 1000, lr = 0.01):
     return(predictions)
 
 
+
 class MultiOutputGaussianProcessRegressor(gpytorch.models.ExactGP):
     def __init__(self, train_x, train_y, likelihood):
         super(MultiOutputGaussianProcessRegressor, self).__init__(train_x, train_y, likelihood)
@@ -87,6 +89,7 @@ class MultiOutputGaussianProcessRegressor(gpytorch.models.ExactGP):
         mean = self.mean_module(x)
         covar = self.covar_module(x)
         return MultivariateNormal(mean, covar)
+
 
 
 def Exact_GP(x1, x2, y2, num_epochs = 1000, lr = 0.01):

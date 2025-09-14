@@ -2,17 +2,17 @@ import numpy as np
 import thinplate as tps
 
 
-def rigid_alignment(coord2, lm1, lm2, return_lm = True):
+def rigid_alignment(lm1, lm2, coord2 = None):
     one=np.ones(lm2.shape[0])
     lm2_1=np.insert(lm2,2,one,axis=1)
     M=np.dot(np.dot(np.linalg.inv(np.dot(lm2_1.T,lm2_1)),lm2_1.T),lm1)
     lm2_tran=np.dot(lm2_1,M)
-    coord2_1=np.c_[coord2,np.ones(coord2.shape[0])]
-    coord2_tran=np.dot(coord2_1,M)
-    if(return_lm):
-        return coord2_tran, lm2_tran
+    if coord2 is None :
+        return lm2_tran
     else:
-        return coord2_tran
+        coord2_1=np.c_[coord2,np.ones(coord2.shape[0])]
+        coord2_tran=np.dot(coord2_1,M)
+        return coord2_tran, lm2_tran
     
 
 def b0(x):
@@ -30,7 +30,6 @@ def b2(x):
 def b3(x):
     x=x**3/6
     return x
-
 
 def warp(points,grid,gx,gy):
     warp_p=np.zeros(points.shape)
@@ -68,7 +67,7 @@ def warp(points,grid,gx,gy):
     return warp_p
             
 
-def non_linear_align(coord1,coord2,lm1,lm2, return_lm = True):
+def non_rigid_alignment(lm1,lm2, coord2 = None):
 
     theta2 = tps.tps_theta_from_points(lm1,lm2, reduced=True)
     grid2 = tps.tps_grid(theta2, lm2, (20,20))
@@ -85,10 +84,9 @@ def non_linear_align(coord1,coord2,lm1,lm2, return_lm = True):
     gx=grid_or[1,1,0]-grid_or[0,1,0]
     gy=grid_or[1,1,1]-grid_or[1,0,1]
 
-    coord2_tran=warp(coord2,grid2,gx,gy)
     lm2_tran=warp(lm2,grid2,gx,gy)
-
-    if(return_lm):
-        return coord2_tran, lm2_tran
+    if coord2 is None :
+        return lm2_tran
     else:
-        return coord2_tran
+        coord2_tran=warp(coord2,grid2,gx,gy)
+        return lm2_tran, coord2_tran
