@@ -1,6 +1,6 @@
 [project]
 name = "ariel-srt"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = [
     {name = "Yang Wanshuo", email = "yangwanshuo@example.com"},
