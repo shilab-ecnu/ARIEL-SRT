@@ -12,7 +12,7 @@ def rigid_alignment(lm1, lm2, coord2 = None):
     else:
         coord2_1=np.c_[coord2,np.ones(coord2.shape[0])]
         coord2_tran=np.dot(coord2_1,M)
-        return coord2_tran, lm2_tran
+        return lm2_tran, coord2_tran
     
 
 def b0(x):
