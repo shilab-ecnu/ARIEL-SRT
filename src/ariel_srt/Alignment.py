@@ -12,8 +12,30 @@ def rigid_alignment(lm1, lm2, coord2 = None):
     else:
         coord2_1=np.c_[coord2,np.ones(coord2.shape[0])]
         coord2_tran=np.dot(coord2_1,M)
-        return lm2_tran, coord2_tran
+        return lm2_tran, coord2_tran            
+
+
+def non_rigid_alignment(lm1,lm2, coord2 = None):
+    theta = tps.tps_theta_from_points(lm1,lm2, reduced=True)
+    theta_x = theta[:, 0]
+    theta_y = theta[:, 1]
     
+    transformed_lm_x = tps.TPS.z(lm2, lm2, theta_x)
+    transformed_lm_y = tps.TPS.z(lm2, lm2, theta_y)
+    transformed_lm_xy = np.column_stack([transformed_lm_x, transformed_lm_y])
+    lm2_tran = lm2 + transformed_lm_xy
+    
+    if coord2 is None :
+        return lm2_tran
+    else:
+        transformed_x = tps.TPS.z(coord2, lm2, theta_x)
+        transformed_y = tps.TPS.z(coord2, lm2, theta_y)
+        transformed_xy = np.column_stack([transformed_x, transformed_y])
+        coord2_tran = coord2 + transformed_xy
+        return lm2_tran, coord2_tran
+
+''' 
+old version, has been discarded
 
 def b0(x):
     x=((1-x)**3)/6
@@ -65,28 +87,4 @@ def warp(points,grid,gx,gy):
                 warp_p[i,:]=grid[xleft,ylow,:]*(1-dx)*(1-dy)+grid[xleft+1,ylow,:]*dx*(1-dy)+grid[xleft+1,ylow+1,:]*dx*dy+grid[xleft,ylow+1,:]*(1-dx)*dy
             
     return warp_p
-            
-
-def non_rigid_alignment(lm1,lm2, coord2 = None):
-
-    theta2 = tps.tps_theta_from_points(lm1,lm2, reduced=True)
-    grid2 = tps.tps_grid(theta2, lm2, (20,20))
-    grid2= np.swapaxes(grid2, 0, 1)
-
-    grid_or=np.zeros(grid2.shape)
-    xseq=np.linspace(0,1,20)
-    yseq=np.linspace(0,1,20)
-    for i in range(grid_or.shape[0]):
-        for j in range(grid_or.shape[1]):
-            grid_or[:,j,0]=xseq
-            grid_or[i,:,1]=yseq
-
-    gx=grid_or[1,1,0]-grid_or[0,1,0]
-    gy=grid_or[1,1,1]-grid_or[1,0,1]
-
-    lm2_tran=warp(lm2,grid2,gx,gy)
-    if coord2 is None :
-        return lm2_tran
-    else:
-        coord2_tran=warp(coord2,grid2,gx,gy)
-        return lm2_tran, coord2_tran
+'''
